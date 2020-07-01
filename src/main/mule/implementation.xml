@@ -1,0 +1,89 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core" xmlns:os="http://www.mulesoft.org/schema/mule/os"
+	xmlns:http="http://www.mulesoft.org/schema/mule/http"
+	xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
+http://www.mulesoft.org/schema/mule/os http://www.mulesoft.org/schema/mule/os/current/mule-os.xsd
+http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd">
+	<os:object-store name="Routes_Response_ObjectStore" doc:name="Object store" doc:id="838656ea-d808-486a-a125-fb5f0684838b" persistent="false" entryTtl="1" entryTtlUnit="DAYS" expirationIntervalUnit="DAYS" />
+	<os:object-store name="Schedules_Response_Object_store" doc:name="Object store" doc:id="7ae9d9ee-7a2e-48d9-b1e0-10e3693ccac0" persistent="false" entryTtl="30" entryTtlUnit="MINUTES" expirationInterval="30" />
+	<flow name="routesFlow" doc:id="eb9910ee-8fcd-4342-96c4-9892a2fed264" >
+		<set-variable value="#[attributes.uriParams.transportType]" doc:name="Set transportType" doc:id="eb4e3658-fe62-4d45-a7a2-eb7acf1050e1" variableName="transportType"/>
+		<os:retrieve doc:name="Retrieve" doc:id="82dafb42-2092-4ad9-ba33-749a2365d482" key="#[vars.transportType]" objectStore="Routes_Response_ObjectStore">
+			<os:default-value ><![CDATA[false]]></os:default-value>
+		</os:retrieve>
+		<choice doc:name="Choice" doc:id="0bfb8703-15af-48a4-9e12-5675927cbf7a" >
+			<when expression='#[payload == "false"]'>
+				<http:request method="GET" doc:name="Request" doc:id="3ec2148b-5140-4ed7-90d0-e6a6c8151fc4" config-ref="FirstCoach_Routes_HTTP_Req_Conf" path="/fetchRoutes" />
+				<ee:transform doc:name="Transform Message" doc:id="c58a85e4-759b-4064-9185-3b39b6b484d5" >
+					<ee:message >
+						<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+payload map ( payload01 , indexOfPayload01 ) -> {
+	originLocation: {
+		locationCode: payload01.departureLocationCode
+	},
+	destinationLocation: {
+		locationCode: payload01.arrivalLocationCode
+	}
+}]]></ee:set-payload>
+					</ee:message>
+				</ee:transform>
+				<os:store doc:name="Store" doc:id="cdf8150f-ce71-458d-a637-19c79590c912" key="#[vars.transportType]" objectStore="Routes_Response_ObjectStore"/>
+				<logger level="INFO" doc:name="Logger" doc:id="a7d557f1-8613-40d9-8c38-aaa883db9d97" message='#["Data cached for transportType: " ++ vars.transportType]'/>
+			</when>
+			<otherwise >
+				<logger level="INFO" doc:name="Logger" doc:id="a5514d16-3c19-49fa-8755-c6396e4c115f" message='#["Returning cached data for transportType: " ++ vars.transportType]'/>
+			</otherwise>
+		</choice>
+	</flow>
+	<flow name="scheduleFlow" doc:id="16de3174-0c08-4235-adcb-802186d00cb6" >
+		<set-variable value="#[attributes.queryParams.departureLocationCode ++ attributes.queryParams.destinationLocationCode]" doc:name="Set object-store-key" doc:id="e56584b6-0c66-472d-9dc7-3d845c7af552" variableName="object-store-key"/>
+		<try doc:name="Try" doc:id="698342ba-29ea-4310-b588-d00bdefe3ff4" >
+			<ee:transform doc:name="Transform Message" doc:id="eabaa61a-18e8-412f-8ee4-d624daae1db0" >
+				<ee:message >
+					<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+{
+	departureLocationCode: message.attributes.queryParams.departureLocationCode,
+	destinationLocationCode:  message.attributes.queryParams.destinationLocationCode
+}]]></ee:set-payload>
+				</ee:message>
+				<ee:variables />
+			</ee:transform>
+			<http:request method="POST" doc:name="Request" doc:id="c0e6e111-f5c1-489f-bfec-fc1e89095c86" config-ref="FirstCoach_Schedule_HTTP_Req_Conf" path="/fetchSchedules" />
+			<ee:transform doc:name="Transform Message" doc:id="e7cd5c45-da1f-47b8-a711-52b0cd45519e" >
+				<ee:message >
+					<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+{
+	departureSchedules: payload.schedules map ( schedule , indexOfSchedule ) -> {
+		availableSeats: schedule.availableSeats,
+		departureDateTime: schedule.departureDateTime,
+		travelRoute: {
+			destinationLocation: {
+				locationCode: schedule.toLocation
+			},
+			originLocation: {
+				locationCode: schedule.fromLocation
+			}
+		}
+	}
+}]]></ee:set-payload>
+				</ee:message>
+			</ee:transform>
+			<os:store doc:name="Store" doc:id="1c16ee54-03d2-4d23-a81d-5b9dcd0754ab" key='#[vars."object-store-key"]' objectStore="Schedules_Response_Object_store"/>
+			<error-handler >
+				<on-error-continue enableNotifications="true" logException="true" doc:name="On Error Continue" doc:id="7ac10124-46d8-4a73-bba6-a64ea40a414c" when='#[error.errorType.namespace == "HTTP"]'>
+					<os:retrieve doc:name="Retrieve" doc:id="18681397-502e-48fd-9daa-9a8a6ec7d051" key='#[vars."object-store-key"]' objectStore="Schedules_Response_Object_store">
+						<os:default-value ><![CDATA[[]]]></os:default-value>
+					</os:retrieve>
+				</on-error-continue>
+			</error-handler>
+		</try>
+	</flow>
+</mule>

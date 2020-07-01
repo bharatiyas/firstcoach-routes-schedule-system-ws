@@ -1,0 +1,14 @@
+http:
+  port: "8082"
+https:
+  port: "7072"  
+  
+firstcoach:
+  routes:
+    host: "localhost"
+    port: "9091"
+    
+  schedule:
+    host: "localhost"
+    port: "9092"
+    

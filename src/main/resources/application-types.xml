@@ -1,0 +1,98 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<types:mule xmlns:types="http://www.mulesoft.org/schema/mule/types">
+  <types:catalog>
+    <types:type name="fetchRoutes-response-json" format="json">
+      <types:shape format="weave" example="examples/fetchRoutes-response.json"><![CDATA[%dw 2.0
+
+type fetchRoutes_response_json = Array<{|  departureLocationCode: String,   arrivalLocationCode: String|}> {"example": "[{\\\"departureLocationCode\\\":\\\"BEN-SG\\\",\\\"arrivalLocationCode\\\":\\\"KLG-MY\\\"},{\\\"departureLocationCode\\\":\\\"BEN-SG\\\",\\\"arrivalLocationCode\\\":\\\"BU-MY\\\"},{\\\"departureLocationCode\\\":\\\"BEN-SG\\\",\\\"arrivalLocationCode\\\":\\\"TAR-MY\\\"}]"}
+
+]]></types:shape>
+    </types:type>
+    <types:type name="api-routes-response-json" format="json">
+      <types:shape format="weave" example="examples/api-routes-response.json"><![CDATA[%dw 2.0
+
+type api_routes_response_json = Array<{|  originLocation: {| locationCode: String |},   destinationLocation: {| locationCode: String |}|}> {"example": "[{\\\"originLocation\\\":{\\\"locationCode\\\":\\\"BEN-SG\\\"},\\\"destinationLocation\\\":{\\\"locationCode\\\":\\\"KLG-MY\\\"}}]"}
+
+]]></types:shape>
+    </types:type>
+    <types:type name="api-schedule-response-json" format="json">
+      <types:shape format="weave" example="examples/api-schedule-response.json"><![CDATA[%dw 2.0
+
+type api_schedule_response_json = {|
+  departureSchedules: Array<{|    availableSeats: Number {"typeId": "int"},     departureDateTime: String,     travelRoute: {|      destinationLocation: {| locationCode: String |},       originLocation: {| locationCode: String |}    |}  |}>
+|} {"example": "{\\\"departureSchedules\\\":[{\\\"availableSeats\\\":20,\\\"departureDateTime\\\":\\\"2019-04-30T16:41:41.090Z\\\",\\\"travelRoute\\\":{\\\"destinationLocation\\\":{\\\"locationCode\\\":\\\"KLG-MY\\\"},\\\"originLocation\\\":{\\\"locationCode\\\":\\\"BEN-SG\\\"}}},{\\\"availableSeats\\\":30,\\\"departureDateTime\\\":\\\"2019-04-30T16:41:41.090Z\\\",\\\"travelRoute\\\":{\\\"destinationLocation\\\":{\\\"locationCode\\\":\\\"KLG-MY\\\"},\\\"originLocation\\\":{\\\"locationCode\\\":\\\"BL-SG\\\"}}}]}"}
+
+]]></types:shape>
+    </types:type>
+    <types:type name="fetchSchedules-response-json" format="json">
+      <types:shape format="weave" example="examples/fetchSchedules-response.json"><![CDATA[%dw 2.0
+
+type fetchSchedules_response_json = {|
+  schedules: Array<{|    departureDateTime: String,     fromLocation: String,     toLocation: String,     availableSeats: Number {"typeId": "int"}  |}>
+|} {"example": "{\\\"schedules\\\":[{\\\"departureDateTime\\\":\\\"2019-04-30T16:41:41.090Z\\\",\\\"fromLocation\\\":\\\"BEN-SG\\\",\\\"toLocation\\\":\\\"KLG-MY\\\",\\\"availableSeats\\\":50},{\\\"departureDateTime\\\":\\\"2019-04-30T18:41:41.090Z\\\",\\\"fromLocation\\\":\\\"BEN-SG\\\",\\\"toLocation\\\":\\\"KLG-MY\\\",\\\"availableSeats\\\":10}]}"}
+
+]]></types:shape>
+    </types:type>
+    <types:type name="api-schedule-request-json" format="json">
+      <types:shape format="weave" example="examples/api-schedule-request.json"><![CDATA[%dw 2.0
+
+type api_schedule_request_json = {|
+  departureLocationCode: String, 
+  destinationLocationCode: String
+|} {"example": "{\\\"departureLocationCode\\\":\\\"BEN-SG\\\",\\\"destinationLocationCode\\\":\\\"KLG-MY\\\"}"}
+
+]]></types:shape>
+    </types:type>
+    <types:type name="fetchSchedules-request-json" format="json">
+      <types:shape format="weave" example="examples/fetchSchedules-request.json"><![CDATA[%dw 2.0
+
+type fetchSchedules_request_json = {|
+  departureLocationCode: String, 
+  destinationLocationCode: String
+|} {"example": "{\\\"departureLocationCode\\\":\\\"BEN-SG\\\",\\\"destinationLocationCode\\\":\\\"KLG-MY\\\"}"}
+
+]]></types:shape>
+    </types:type>
+    <types:type name="object-store-key-string" format="java">
+      <types:shape format="raml"><![CDATA[#%RAML 1.0 DataType
+type: string]]></types:shape>
+    </types:type>
+  </types:catalog>
+  <types:enrichment select="#c58a85e4-759b-4064-9185-3b39b6b484d5">
+    <types:processor-declaration>
+      <types:input-event>
+        <types:message>
+          <types:payload type="fetchRoutes-response-json"/>
+        </types:message>
+      </types:input-event>
+      <types:output-event>
+        <types:message>
+          <types:payload type="api-routes-response-json"/>
+        </types:message>
+      </types:output-event>
+    </types:processor-declaration>
+  </types:enrichment>
+  <types:enrichment select="#e7cd5c45-da1f-47b8-a711-52b0cd45519e">
+    <types:processor-declaration>
+      <types:input-event>
+        <types:message>
+          <types:payload type="fetchSchedules-response-json"/>
+        </types:message>
+      </types:input-event>
+      <types:output-event>
+        <types:message>
+          <types:payload type="api-schedule-response-json"/>
+        </types:message>
+      </types:output-event>
+    </types:processor-declaration>
+  </types:enrichment>
+  <types:enrichment select="#eabaa61a-18e8-412f-8ee4-d624daae1db0">
+    <types:processor-declaration>
+      <types:output-event>
+        <types:message>
+          <types:payload type="fetchSchedules-request-json"/>
+        </types:message>
+      </types:output-event>
+    </types:processor-declaration>
+  </types:enrichment>
+</types:mule>
