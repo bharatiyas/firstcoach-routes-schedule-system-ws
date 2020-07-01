@@ -1,0 +1,54 @@
+{
+	"info": {
+		"_postman_id": "b3b24653-c8b7-49eb-be27-2cd8f2ffc879",
+		"name": "firstcoach-routes-schedules-sys-api",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "FirstCoach-Routes-Schedules-Sys-API-Routes",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "https://{{firstcoach-rt-sch-sys-api-host}}:{{firstcoach-rt-sch-sys-api-port}}/api/transportType/FirstCoach/routes",
+					"protocol": "https",
+					"host": [
+						"{{firstcoach-rt-sch-sys-api-host}}"
+					],
+					"port": "{{firstcoach-rt-sch-sys-api-port}}",
+					"path": [
+						"api",
+						"transportType",
+						"FirstCoach",
+						"routes"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "FirstCoach-Routes-Schedules-Sys-API-Schedules",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "https://{{firstcoach-rt-sch-sys-api-host}}:{{firstcoach-rt-sch-sys-api-port}}/api/transportType/FirstCoach/schedules",
+					"protocol": "https",
+					"host": [
+						"{{firstcoach-rt-sch-sys-api-host}}"
+					],
+					"port": "{{firstcoach-rt-sch-sys-api-port}}",
+					"path": [
+						"api",
+						"transportType",
+						"FirstCoach",
+						"schedules"
+					]
+				}
+			},
+			"response": []
+		}
+	],
+	"protocolProfileBehavior": {}
+}
