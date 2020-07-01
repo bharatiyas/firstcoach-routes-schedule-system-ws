@@ -9,13 +9,20 @@ http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/
 	<os:object-store name="Routes_Response_ObjectStore" doc:name="Object store" doc:id="838656ea-d808-486a-a125-fb5f0684838b" persistent="false" entryTtl="1" entryTtlUnit="DAYS" expirationIntervalUnit="DAYS" />
 	<os:object-store name="Schedules_Response_Object_store" doc:name="Object store" doc:id="7ae9d9ee-7a2e-48d9-b1e0-10e3693ccac0" persistent="false" entryTtl="30" entryTtlUnit="MINUTES" expirationInterval="30" />
 	<flow name="routesFlow" doc:id="eb9910ee-8fcd-4342-96c4-9892a2fed264" >
-		<set-variable value="#[attributes.uriParams.transportType]" doc:name="Set transportType" doc:id="eb4e3658-fe62-4d45-a7a2-eb7acf1050e1" variableName="transportType"/>
+		<set-variable value="#[message.attributes.uriParams.transportType]" doc:name="Set transportType" doc:id="eb4e3658-fe62-4d45-a7a2-eb7acf1050e1" variableName="transportType"/>
 		<os:retrieve doc:name="Retrieve" doc:id="82dafb42-2092-4ad9-ba33-749a2365d482" key="#[vars.transportType]" objectStore="Routes_Response_ObjectStore">
 			<os:default-value ><![CDATA[false]]></os:default-value>
 		</os:retrieve>
 		<choice doc:name="Choice" doc:id="0bfb8703-15af-48a4-9e12-5675927cbf7a" >
 			<when expression='#[payload == "false"]'>
-				<http:request method="GET" doc:name="Request" doc:id="3ec2148b-5140-4ed7-90d0-e6a6c8151fc4" config-ref="FirstCoach_Routes_HTTP_Req_Conf" path="/fetchRoutes" />
+				<try doc:name="Try" doc:id="c3f806b5-4a96-491e-8524-06cfb4915263" >
+					<http:request method="GET" doc:name="Request" doc:id="3ec2148b-5140-4ed7-90d0-e6a6c8151fc4" config-ref="FirstCoach_Routes_HTTP_Req_Conf" path="/fetchRoutes" />
+					<error-handler >
+						<on-error-propagate enableNotifications="true" logException="true" doc:name="On Error Propagate" doc:id="1e000c1f-e3b1-4df0-9196-6d6ced33b3b6" >
+							<set-payload value="Internal Server Error. Error encountered while calling third party API." doc:name="Set Payload" doc:id="61392064-0146-4da4-9bd8-5dd8719621ec" />
+						</on-error-propagate>
+					</error-handler>
+				</try>
 				<ee:transform doc:name="Transform Message" doc:id="c58a85e4-759b-4064-9185-3b39b6b484d5" >
 					<ee:message >
 						<ee:set-payload ><![CDATA[%dw 2.0
