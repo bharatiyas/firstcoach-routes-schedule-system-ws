@@ -8,6 +8,21 @@
 		{
 			"name": "FirstCoach-Routes-Schedules-Sys-API-Routes",
 			"request": {
+				"auth": {
+					"type": "basic",
+					"basic": [
+						{
+							"key": "password",
+							"value": "{{firstcoach-rt-sch-sys-api-password}}",
+							"type": "string"
+						},
+						{
+							"key": "username",
+							"value": "{{firstcoach-rt-sch-sys-api-username}}",
+							"type": "string"
+						}
+					]
+				},
 				"method": "GET",
 				"header": [],
 				"url": {
@@ -33,7 +48,7 @@
 				"method": "GET",
 				"header": [],
 				"url": {
-					"raw": "https://{{firstcoach-rt-sch-sys-api-host}}:{{firstcoach-rt-sch-sys-api-port}}/api/transportType/FirstCoach/schedules",
+					"raw": "https://{{firstcoach-rt-sch-sys-api-host}}:{{firstcoach-rt-sch-sys-api-port}}/api/transportType/FirstCoach/schedules?departureLocationCode=BNE&destinationLocationCode=BKK",
 					"protocol": "https",
 					"host": [
 						"{{firstcoach-rt-sch-sys-api-host}}"
@@ -44,6 +59,16 @@
 						"transportType",
 						"FirstCoach",
 						"schedules"
+					],
+					"query": [
+						{
+							"key": "departureLocationCode",
+							"value": "BNE"
+						},
+						{
+							"key": "destinationLocationCode",
+							"value": "BKK"
+						}
 					]
 				}
 			},

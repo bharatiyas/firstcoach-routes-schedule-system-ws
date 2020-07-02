@@ -1,13 +1,14 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<mule xmlns:http="http://www.mulesoft.org/schema/mule/http" xmlns="http://www.mulesoft.org/schema/mule/core"
-	xmlns:doc="http://www.mulesoft.org/schema/mule/documentation"
-	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
-http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd">
-	<http:request-config name="FirstCoach_Routes_HTTP_Req_Conf" doc:name="HTTP Request configuration" doc:id="04a236e8-b99e-4793-8bae-25b5ce9195d5" >
+<mule xmlns:spring="http://www.mulesoft.org/schema/mule/spring" xmlns:http="http://www.mulesoft.org/schema/mule/http"
+	xmlns="http://www.mulesoft.org/schema/mule/core"
+	xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
+http://www.mulesoft.org/schema/mule/spring http://www.mulesoft.org/schema/mule/spring/current/mule-spring.xsd">
+	<http:request-config name="FirstCoach_Routes_HTTP_Req_Conf" doc:name="HTTP Request configuration" doc:id="04a236e8-b99e-4793-8bae-25b5ce9195d5" responseTimeout="30000">
 		<http:request-connection host="${firstcoach.routes.host}" port="${firstcoach.routes.port}" />
 	</http:request-config>
-	<http:request-config name="FirstCoach_Schedule_HTTP_Req_Conf" doc:name="HTTP Request configuration" doc:id="fb8f806f-a4d6-49c7-85aa-31ef365550f9" >
+	<http:request-config name="FirstCoach_Schedule_HTTP_Req_Conf" doc:name="HTTP Request configuration" doc:id="fb8f806f-a4d6-49c7-85aa-31ef365550f9" responseTimeout="30000">
 		<http:request-connection host="${firstcoach.schedule.host}" port="${firstcoach.schedule.port}" />
 	</http:request-config>
 	<configuration-properties doc:name="Configuration properties" doc:id="c39a03f5-1512-4821-b741-bf5f1da32c2d" file="config-${env}.yaml" />
