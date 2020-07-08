@@ -1,0 +1,28 @@
+{
+  "departureSchedules": [
+    {
+      "availableSeats": 50,
+      "departureDateTime": "2020-07-07T16:41:41.090Z",
+      "travelRoute": {
+        "destinationLocation": {
+          "locationCode": "BKK-TH"
+        },
+        "originLocation": {
+          "locationCode": "BNE-AU"
+        }
+      }
+    },
+    {
+      "availableSeats": 50,
+      "departureDateTime": "2020-07-10T18:41:41.090Z",
+      "travelRoute": {
+        "destinationLocation": {
+          "locationCode": "BNE-AU"
+        },
+        "originLocation": {
+          "locationCode": "BKK-TH"
+        }
+      }
+    }
+  ]
+}

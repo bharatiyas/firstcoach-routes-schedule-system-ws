@@ -1,0 +1,26 @@
+[
+  {
+    "originLocation": {
+      "locationCode": "BEN-SG"
+    },
+    "destinationLocation": {
+      "locationCode": "KLG-MY"
+    }
+  },
+  {
+    "originLocation": {
+      "locationCode": "BEN-SG"
+    },
+    "destinationLocation": {
+      "locationCode": "BU-MY"
+    }
+  },
+  {
+    "originLocation": {
+      "locationCode": "BEN-SG"
+    },
+    "destinationLocation": {
+      "locationCode": "TAR-MY"
+    }
+  }
+]
