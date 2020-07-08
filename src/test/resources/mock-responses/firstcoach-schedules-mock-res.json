@@ -1,0 +1,16 @@
+{ 
+	"schedules": [ 
+		{ 
+			"departureDateTime": "2020-07-07T16:41:41.090Z", 
+			"fromLocation": "BNE-AU", 
+			"toLocation": "BKK-TH", 
+			"availableSeats" : 50 
+		}, 
+		{ 
+			"departureDateTime": "2020-07-10T18:41:41.090Z", 
+			"fromLocation": "BKK-TH",
+			"toLocation": "BNE-AU",
+			"availableSeats" : 50 
+		} 
+	] 
+}

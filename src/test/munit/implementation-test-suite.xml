@@ -1,0 +1,176 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:munit="http://www.mulesoft.org/schema/mule/munit"
+	xmlns:munit-tools="http://www.mulesoft.org/schema/mule/munit-tools"
+	xmlns="http://www.mulesoft.org/schema/mule/core"
+	xmlns:doc="http://www.mulesoft.org/schema/mule/documentation"
+	xsi:schemaLocation="
+		http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+		http://www.mulesoft.org/schema/mule/munit http://www.mulesoft.org/schema/mule/munit/current/mule-munit.xsd
+		http://www.mulesoft.org/schema/mule/munit-tools  http://www.mulesoft.org/schema/mule/munit-tools/current/mule-munit-tools.xsd">
+	<munit:config name="implementation-test-suite.xml" />
+	<munit:test name="routesFlowTest"
+		doc:id="fa277bef-8694-4071-a31e-49844c3c0054" description="Test">
+		<munit:behavior>
+			<munit-tools:mock-when
+				doc:name="Mock FC Routes API Calls"
+				doc:id="ca46b797-fd5d-48b9-a5f8-bc663533bd80"
+				processor="http:request">
+				<munit-tools:with-attributes>
+					<munit-tools:with-attribute
+						whereValue="GET" attributeName="method" />
+				</munit-tools:with-attributes>
+				<munit-tools:then-return>
+					<munit-tools:payload
+						value="#[MunitTools::getResourceAsString('mock-responses/firstcoach-routes-mock-res.json')]"
+						mediaType="application/json" />
+				</munit-tools:then-return>
+			</munit-tools:mock-when>
+		</munit:behavior>
+		<munit:execution>
+			<munit:set-event doc:name="Set URI Params"
+				doc:id="e0296b82-2836-4a87-8e3f-577ba15141da">
+				<munit:attributes
+					value="#[{uriParams : {'transportType' :'SEA','transportCompany' :'FirstCoach'}}]" />
+			</munit:set-event>
+			<flow-ref doc:name="Flow-ref to routesFlow"
+				doc:id="00279191-1aa1-4b0f-8725-99a4834e163b" name="routesFlow" />
+		</munit:execution>
+		<munit:validation>
+			<munit-tools:assert-that
+				doc:name="Check not null"
+				doc:id="d3c401a9-f3e9-407b-b293-359b220505e9"
+				expression="#[payload]" is="#[MunitTools::notNullValue()]" />
+			<munit-tools:assert-that doc:name="Compare payload" doc:id="d168f3fd-0e91-4657-b829-b321c5747dbe" is="#[MunitTools::equalTo(readUrl('classpath://expected-responses/firstcoach-routes-expected-res.json', 'application/json'))]" expression="#[payload]"/>
+			<munit-tools:verify-call doc:name="Verify OS Store Call" doc:id="5cd07367-38d1-4569-9a0c-f0cbd8be1dfd" processor="os:store" times="1">
+				<munit-tools:with-attributes >
+					<munit-tools:with-attribute whereValue="SEA" attributeName="key" />
+				</munit-tools:with-attributes>
+			</munit-tools:verify-call>
+		</munit:validation>
+	</munit:test>
+		<munit:test name="routesFlowTest_secondCall_fromOS" doc:id="a4d0ca2e-2455-46c8-a8e0-0f29c9eb533e" description="Test">
+			<munit:behavior >
+				<munit-tools:mock-when doc:name="Mock FC Routes API Calls" doc:id="83b30c54-bdba-41df-b935-1ea6971281b1" processor="http:request" >
+					<munit-tools:with-attributes >
+						<munit-tools:with-attribute whereValue="GET" attributeName="method" />
+					</munit-tools:with-attributes>
+					<munit-tools:then-return >
+						<munit-tools:payload value="#[MunitTools::getResourceAsString('mock-responses/firstcoach-routes-mock-res.json')]" mediaType="application/json" />
+					</munit-tools:then-return>
+				</munit-tools:mock-when>
+			</munit:behavior>
+			<munit:execution >
+				<munit:set-event doc:name="Set URI Params" doc:id="ea3a5f82-ae47-4f07-9dac-7ae0a795ac62" >
+				<munit:attributes value="#[{uriParams : {'transportType' :'AIR','transportCompany' :'FirstCoach'}}]" />
+
+				</munit:set-event>
+				<flow-ref doc:name="First Call to routesFlow" doc:id="08f99cb4-0dd6-41c2-913d-556757cb816d" name="routesFlow" />
+				<munit:set-event doc:name="Set URI Params" doc:id="4d05de33-b46b-4c0b-8454-f90e280d630e" >
+				<munit:attributes value="#[{uriParams : {'transportType' :'AIR','transportCompany' :'FirstCoach'}}]" />
+
+				</munit:set-event>
+				<flow-ref doc:name="Second Call to routesFlow" doc:id="37d8bf89-cf76-41e4-9cd7-0cb802aa9f94" name="routesFlow" />
+			</munit:execution>
+			<munit:validation >
+				<munit-tools:assert-that doc:name="Check not null" doc:id="7cd64302-e413-4bd7-80b5-a77de8ef093a" expression="#[payload]" is="#[MunitTools::notNullValue()]" />
+				<munit-tools:assert-that doc:name="Compare payload" doc:id="16dcdb2b-53f0-4df6-9b4c-4432e8594d7f" expression="#[payload]" is="#[MunitTools::equalTo(readUrl('classpath://expected-responses/firstcoach-routes-expected-res.json', 'application/json'))]" />
+				<munit-tools:verify-call doc:name="Verify OS Store Call" doc:id="ab85df22-8a82-4ad5-bc74-84fb1afd7a28" processor="os:store" times="1" >
+				<munit-tools:with-attributes >
+					<munit-tools:with-attribute whereValue="AIR" attributeName="key" />
+				</munit-tools:with-attributes>
+
+				</munit-tools:verify-call>
+			<munit-tools:verify-call doc:name="Verify OS Retrieve Call" doc:id="3c305a2e-622b-4671-8c06-69e4ed6012f5" processor="os:retrieve" times="2">
+				<munit-tools:with-attributes >
+					<munit-tools:with-attribute whereValue="AIR" attributeName="key" />
+				</munit-tools:with-attributes>
+			</munit-tools:verify-call>
+			
+</munit:validation>
+		</munit:test>
+	
+	<munit:test name="scheduleFlowTest" doc:id="3efc579d-9022-4d08-9fb9-0f0a6ccf7698" description="Test">
+		<munit:behavior >
+			<munit-tools:mock-when doc:name="Mock FC Schedules API Calls" doc:id="d289e581-96ff-4207-9097-16929829bfcb" processor="http:request">
+				<munit-tools:with-attributes >
+					<munit-tools:with-attribute whereValue="POST" attributeName="method" />
+				</munit-tools:with-attributes>
+				<munit-tools:then-return >
+					<munit-tools:payload value="#[MunitTools::getResourceAsString('mock-responses/firstcoach-schedules-mock-res.json')]" mediaType="application/json" />
+				</munit-tools:then-return>
+			</munit-tools:mock-when>
+		</munit:behavior>
+		<munit:execution >
+			<munit:set-event doc:name="Set URI n Query Params" doc:id="0e2be876-499d-4857-991a-a7670b40087e" >
+				<munit:attributes value="#[{uriParams : {'transportType' :'SEA','transportCompany' :'FirstCoach'},queryParams : {'departureLocationCode' :'BNE','destinationLocationCode' :'BKK'}}]" />
+			</munit:set-event>
+			<flow-ref doc:name="Flow-ref to scheduleFlow" doc:id="b830c6fa-de7d-4fec-82fd-f0aee2fb2e3e" name="scheduleFlow"/>
+		</munit:execution>
+		<munit:validation >
+			<munit-tools:assert-that doc:name="Check not null" doc:id="31c09457-ee57-4d45-ab78-f41d66efc49b" is="#[MunitTools::notNullValue()]" expression="#[payload]"/>
+			<munit-tools:assert-that doc:name="Compare payload" doc:id="b84a61dc-4fc1-447b-8651-48f00b59265d" expression="#[payload]" is="#[MunitTools::equalTo(readUrl('classpath://expected-responses/firstcoach-schedules-expected-res.json', 'application/json'))]"/>
+			<munit-tools:verify-call doc:name="Verify OS Store Call" doc:id="0a3d4fe9-7b04-4c24-9794-69b141080682" processor="os:store" times="1">
+				<munit-tools:with-attributes >
+					<munit-tools:with-attribute whereValue="BNEBKK" attributeName="key" />
+				</munit-tools:with-attributes>
+			</munit-tools:verify-call>
+		</munit:validation>
+	</munit:test>
+	
+		<munit:test name="scheduleFlowTest_HTTPError_fromOS" doc:id="67a3f2db-e9f0-4fd0-942d-b77315565c9d" description="Test" >
+			<munit:behavior >
+			<munit-tools:mock-when doc:name="Mock HTTP Error" doc:id="602eb0d8-9eb2-4c7c-9130-dfa456fe426a" processor="http:request">
+				<munit-tools:with-attributes >
+					<munit-tools:with-attribute whereValue="POST" attributeName="method" />
+					<munit-tools:with-attribute whereValue="LAND" attributeName="message.attributes.uriParams.transportType" />
+				</munit-tools:with-attributes>
+				<munit-tools:then-return >
+					<munit-tools:error typeId="HTTP:CONNECTIVITY" />
+				</munit-tools:then-return>
+			</munit-tools:mock-when>
+			</munit:behavior>
+			<munit:execution >
+				<munit:set-event doc:name="Set URI n Query Params" doc:id="bd4a59fe-dc75-4e1e-8579-a38833898572" >
+				<munit:attributes value="#[{uriParams : {'transportType' :'AIR','transportCompany' :'FirstCoach'},queryParams : {'departureLocationCode' :'SYD','destinationLocationCode' :'CCU'}}]" />
+				</munit:set-event>
+				<munit-tools:store doc:name="Store" doc:id="bab9454b-a5d2-4d3d-bc1a-a69a7bcf664b" key="SYDCCU">
+				<munit-tools:value ><![CDATA[{ 
+	"schedules": [ 
+		{ 
+			"departureDateTime": "2020-07-07T16:41:41.090Z", 
+			"fromLocation": "BNE-AU", 
+			"toLocation": "BKK-TH", 
+			"availableSeats" : 50 
+		}, 
+		{ 
+			"departureDateTime": "2020-07-10T18:41:41.090Z", 
+			"fromLocation": "BKK-TH",
+			"toLocation": "BNE-AU",
+			"availableSeats" : 50 
+		} 
+	] 
+}]]></munit-tools:value>
+			</munit-tools:store>
+			<flow-ref doc:name="Call to scheduleFlow" doc:id="b5fb35a1-358e-44ea-bf3e-d1d510af1b0c" name="scheduleFlow" />
+			</munit:execution>
+			<munit:validation >
+				<munit-tools:assert-that doc:name="Check not null" doc:id="f25ad0a4-1727-4b28-92ce-a9dd933dbd9b" is="#[MunitTools::notNullValue()]" expression="#[payload]" />
+			<munit-tools:verify-call doc:name="Verify OS Store Call" doc:id="d6c64569-fc90-493e-b613-958ad6710c62" processor="os:store" times="0" >
+				<munit-tools:with-attributes >
+					<munit-tools:with-attribute whereValue="SYDCCU" attributeName="key" />
+				</munit-tools:with-attributes>
+				</munit-tools:verify-call>
+			<munit-tools:verify-call doc:name="Verify OS Retrieve Call" doc:id="50a7cdb3-5d41-430e-abe7-a7fab8b84ae9" processor="os:retrieve" times="1">
+				<munit-tools:with-attributes >
+					<munit-tools:with-attribute whereValue="SYDCCU" attributeName="key" />
+				</munit-tools:with-attributes>
+			</munit-tools:verify-call>
+			</munit:validation>
+		</munit:test>
+	
+	
+
+
+</mule>
