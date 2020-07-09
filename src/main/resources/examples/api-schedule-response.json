@@ -1,28 +1,26 @@
-{
-	"departureSchedules": [
-		{
-			"availableSeats": 20,
-			"departureDateTime": "2019-04-30T16:41:41.090Z",
-			"travelRoute": {
-				"destinationLocation": {
-					"locationCode": "KLG-MY"
-				},
-				"originLocation": {
-					"locationCode": "BEN-SG"
-				}
-			}
-		},
-		{
-			"availableSeats": 30,
-			"departureDateTime": "2019-04-30T16:41:41.090Z",
-			"travelRoute": {
-				"destinationLocation": {
-					"locationCode": "KLG-MY"
-				},
-				"originLocation": {
-					"locationCode": "BL-SG"
-				}
+[
+	{
+		"availableSeats": 20,
+		"departureDateTime": "2019-04-30T16:41:41.090Z",
+		"travelRoute": {
+			"destinationLocation": {
+				"locationCode": "KLG-MY"
+			},
+			"originLocation": {
+				"locationCode": "BEN-SG"
 			}
 		}
-	]
-}
+	},
+	{
+		"availableSeats": 30,
+		"departureDateTime": "2019-04-30T16:41:41.090Z",
+		"travelRoute": {
+			"destinationLocation": {
+				"locationCode": "KLG-MY"
+			},
+			"originLocation": {
+				"locationCode": "BL-SG"
+			}
+		}
+	}
+]

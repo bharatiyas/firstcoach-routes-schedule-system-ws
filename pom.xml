@@ -134,13 +134,6 @@
             <classifier>mule-plugin</classifier>
         </dependency>
     	<dependency>
-            <groupId>4c4287b2-7066-4b83-864f-60985a79247e</groupId>
-            <artifactId>firstcoach-routes-and-schedule-system-api</artifactId>
-            <version>1.0.3</version>
-            <classifier>raml</classifier>
-            <type>zip</type>
-        </dependency>
-    	<dependency>
             <groupId>com.mulesoft.munit</groupId>
             <artifactId>munit-runner</artifactId>
             <version>2.2.4</version>
@@ -152,6 +145,13 @@
             <version>2.2.4</version>
             <classifier>mule-plugin</classifier>
             <scope>test</scope>
+        </dependency>
+    	<dependency>
+            <groupId>4c4287b2-7066-4b83-864f-60985a79247e</groupId>
+            <artifactId>firstcoach-routes-and-schedule-system-api</artifactId>
+            <version>1.0.4</version>
+            <classifier>raml</classifier>
+            <type>zip</type>
         </dependency>
     </dependencies>
 

@@ -19,7 +19,16 @@ http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/
 					<http:request method="GET" doc:name="Call FirstCoach Routes API" doc:id="3ec2148b-5140-4ed7-90d0-e6a6c8151fc4" config-ref="FirstCoach_Routes_HTTP_Req_Conf" path="/fetchRoutes" />
 					<error-handler >
 						<on-error-propagate enableNotifications="true" logException="true" doc:name="On Error Propagate" doc:id="1e000c1f-e3b1-4df0-9196-6d6ced33b3b6" >
-							<set-payload value="Internal Server Error. Error encountered while calling third party API." doc:name="Set Payload" doc:id="61392064-0146-4da4-9bd8-5dd8719621ec" />
+							<ee:transform doc:name="Set Payload" doc:id="1ca82ceb-7a5a-423f-94ad-ea1f0b855624" >
+								<ee:message >
+									<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+{
+	"message": "Error encountered while calling third party API"
+}]]></ee:set-payload>
+								</ee:message>
+							</ee:transform>
 						</on-error-propagate>
 					</error-handler>
 				</try>
@@ -45,6 +54,35 @@ payload map ( payload01 , indexOfPayload01 ) -> {
 				<logger level="INFO" doc:name="Logger" doc:id="a5514d16-3c19-49fa-8755-c6396e4c115f" message='#["Returning cached data for transportType: " ++ vars.transportType]'/>
 			</otherwise>
 		</choice>
+		<error-handler >
+			<on-error-propagate enableNotifications="true" logException="true" doc:name="On Error Propagate" doc:id="f764a74e-3592-4de2-84f9-9a4d8df4bb74" >
+				<ee:transform doc:name="Set X-Event-Id" doc:id="304ac876-d4af-44e9-95fc-b2f5adae7c9b" >
+					<ee:message >
+					</ee:message>
+					<ee:variables >
+						<ee:set-variable variableName="outboundHeaders" ><![CDATA[%dw 2.0
+output application/json
+---
+{
+	"X-Event-Id": correlationId
+}]]></ee:set-variable>
+					</ee:variables>
+				</ee:transform>
+				<ee:transform doc:name="Set Payload" doc:id="07053e41-e4a3-4235-92c7-1fc30bf7f8fb" >
+					<ee:message >
+						<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+if (payload.message != "Error encountered while calling third party API")
+{
+	"message": "Internal Server Error"
+} else {
+	"message": "Internal Server Error. Error encountered while calling third party API"
+}]]></ee:set-payload>
+					</ee:message>
+				</ee:transform>
+			</on-error-propagate>
+		</error-handler>
 	</flow>
 	<flow name="scheduleFlow" doc:id="16de3174-0c08-4235-adcb-802186d00cb6" >
 		<set-variable value="#[message.attributes.queryParams.departureLocationCode ++ message.attributes.queryParams.destinationLocationCode]" doc:name="Set object-store-key" doc:id="e56584b6-0c66-472d-9dc7-3d845c7af552" variableName="object-store-key"/>
@@ -86,11 +124,46 @@ output application/json
 			<os:store doc:name="Store in OS" doc:id="1c16ee54-03d2-4d23-a81d-5b9dcd0754ab" key='#[vars."object-store-key"]' objectStore="Schedules_Response_Object_store"/>
 			<error-handler >
 				<on-error-continue enableNotifications="true" logException="true" doc:name="On Error Continue" doc:id="7ac10124-46d8-4a73-bba6-a64ea40a414c" when='#[error.errorType.namespace == "HTTP"]'>
+					<logger level="ERROR" doc:name="Logger" doc:id="d4b61b78-ba02-45b1-af44-b2ccfa7b29f2" message="#[vars.errorCaught]" />
 					<os:retrieve doc:name="Retrieve from OS" doc:id="18681397-502e-48fd-9daa-9a8a6ec7d051" key='#[vars."object-store-key"]' objectStore="Schedules_Response_Object_store">
 						<os:default-value ><![CDATA[[]]]></os:default-value>
 					</os:retrieve>
+					<choice doc:name="Choice" doc:id="be2295b1-356d-43bc-bf0d-ebbca0b31e07" >
+						<when expression='#[payload == "[]"]'>
+							<raise-error doc:name="Raise error" doc:id="1fb5803e-0dca-4e67-a804-fefb1c52dda4" type="MULE:CONNECTIVITY" description="Rethrowing HTTP Connectivity Error"/>
+						</when>
+						<otherwise >
+							<logger level="INFO" doc:name="Logger" doc:id="569b1a48-fbc7-43c8-820d-59f2a0554371" message='#["Returning cached data for Object Store Key: " ++ vars.object-store-key]'/>
+						</otherwise>
+					</choice>
 				</on-error-continue>
 			</error-handler>
 		</try>
+		<error-handler >
+			<on-error-propagate enableNotifications="true" logException="true" doc:name="On Error Propagate" doc:id="71efc4f3-e1ae-4ef1-927f-41d049062cda" >
+				<ee:transform doc:name="Set X-Event-Id" doc:id="3d832339-0155-42ae-b68e-a8f2160a96e4" >
+					<ee:message >
+					</ee:message>
+					<ee:variables >
+						<ee:set-variable variableName="outboundHeaders" ><![CDATA[%dw 2.0
+output application/json
+---
+{
+	"X-Event-Id": correlationId
+}]]></ee:set-variable>
+					</ee:variables>
+				</ee:transform>
+				<ee:transform doc:name="Set Payload" doc:id="1c37c489-0ff4-4a10-88e4-8bb40c79e477" >
+					<ee:message >
+						<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+{
+	"message": "Internal Server Error"
+} ]]></ee:set-payload>
+					</ee:message>
+				</ee:transform>
+			</on-error-propagate>
+		</error-handler>
 	</flow>
 </mule>
