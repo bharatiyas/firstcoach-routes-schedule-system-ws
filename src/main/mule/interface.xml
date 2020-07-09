@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<mule xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:apikit="http://www.mulesoft.org/schema/mule/mule-apikit" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:http="http://www.mulesoft.org/schema/mule/http" xmlns:spring="http://www.mulesoft.org/schema/mule/spring" xmlns:tls="http://www.mulesoft.org/schema/mule/tls" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core  http://www.mulesoft.org/schema/mule/core/current/mule.xsd  http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd  http://www.mulesoft.org/schema/mule/mule-apikit http://www.mulesoft.org/schema/mule/mule-apikit/current/mule-apikit.xsd   http://www.mulesoft.org/schema/mule/tls http://www.mulesoft.org/schema/mule/tls/current/mule-tls.xsd http://www.mulesoft.org/schema/mule/spring http://www.mulesoft.org/schema/mule/spring/current/mule-spring.xsd">
+<mule xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core" xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:apikit="http://www.mulesoft.org/schema/mule/mule-apikit" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:http="http://www.mulesoft.org/schema/mule/http" xmlns:spring="http://www.mulesoft.org/schema/mule/spring" xmlns:tls="http://www.mulesoft.org/schema/mule/tls" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core  http://www.mulesoft.org/schema/mule/core/current/mule.xsd  http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd  http://www.mulesoft.org/schema/mule/mule-apikit http://www.mulesoft.org/schema/mule/mule-apikit/current/mule-apikit.xsd   http://www.mulesoft.org/schema/mule/tls http://www.mulesoft.org/schema/mule/tls/current/mule-tls.xsd http://www.mulesoft.org/schema/mule/spring http://www.mulesoft.org/schema/mule/spring/current/mule-spring.xsd
+http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd">
     <spring:config name="springConfig" files="beans.xml" />
     <spring:security-manager>
         <spring:delegate-security-provider name="memory-provider" delegate-ref="authenticationManager" />
@@ -11,7 +12,7 @@
             </tls:context>
         </http:listener-connection>
     </http:listener-config>
-    <apikit:config name="firstcoach-routes-and-schedule-system-api-config" api="resource::4c4287b2-7066-4b83-864f-60985a79247e:firstcoach-routes-and-schedule-system-api:1.0.4:raml:zip:firstcoach-routes-and-schedule-system-api.raml" outboundHeadersMapName="outboundHeaders" httpStatusVarName="httpStatus" />
+    <apikit:config name="firstcoach-routes-and-schedule-system-api-config" api="resource::4c4287b2-7066-4b83-864f-60985a79247e:firstcoach-routes-and-schedule-system-api:1.0.5:raml:zip:firstcoach-routes-and-schedule-system-api.raml" outboundHeadersMapName="outboundHeaders" httpStatusVarName="httpStatus" />
     <flow name="firstcoach-routes-and-schedule-system-api-main">
         <http:listener config-ref="firstcoach-routes-and-schedule-system-api-httpListenerConfig" path="/api/*">
             <http:response statusCode="#[vars.httpStatus default 200]">
@@ -135,6 +136,21 @@ output application/json
         <http:basic-security-filter realm="mule" />
         <spring:authorization-filter requiredAuthorities="ROLE_ADMIN" />
         <flow-ref doc:name="Flow Reference" doc:id="5f1ef095-0a07-4e3d-ab06-32f65c064376" name="routesFlow" />
+		<error-handler >
+			<on-error-propagate enableNotifications="true" logException="true" doc:name="On Error Propagate" doc:id="076e2855-4396-40ef-98c3-94d3d316513d" type="HTTP:BASIC_AUTHENTICATION">
+				<ee:transform doc:name="Transform Message" doc:id="c3df1132-f091-4b59-883b-cde3be25846e">
+					<ee:message>
+						<ee:set-payload><![CDATA[%dw 2.0
+output application/json
+---
+{
+	"message": "Unathorized"
+}]]></ee:set-payload>
+					</ee:message>
+				</ee:transform>
+				<set-variable value="401" doc:name="Set Variable" doc:id="f3853b02-ef69-41fb-b593-23fdc2889a51" variableName="httpStatus" />
+			</on-error-propagate>
+		</error-handler>
     </flow>
     <flow name="get:\(transportType)\(transportCompany)\schedules:firstcoach-routes-and-schedule-system-api-config">
         <flow-ref doc:name="Flow Reference" doc:id="b5452633-55c2-4adc-8b97-ae63b72cc032" name="scheduleFlow" />
