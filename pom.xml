@@ -149,7 +149,7 @@
     	<dependency>
             <groupId>4c4287b2-7066-4b83-864f-60985a79247e</groupId>
             <artifactId>firstcoach-routes-and-schedule-system-api</artifactId>
-            <version>1.0.4</version>
+            <version>1.0.5</version>
             <classifier>raml</classifier>
             <type>zip</type>
         </dependency>
