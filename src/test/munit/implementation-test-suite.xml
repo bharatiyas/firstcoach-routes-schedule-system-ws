@@ -119,7 +119,7 @@
 		</munit:validation>
 	</munit:test>
 	
-		<munit:test name="scheduleFlowTest_HTTPError_fromOS" doc:id="67a3f2db-e9f0-4fd0-942d-b77315565c9d" description="Test" >
+		<munit:test name="scheduleFlowTest_HTTPError_fromOS" doc:id="67a3f2db-e9f0-4fd0-942d-b77315565c9d" description="Test" expectedErrorType="MULE:CONNECTIVITY">
 			<munit:behavior >
 			<munit-tools:mock-when doc:name="Mock HTTP Error" doc:id="602eb0d8-9eb2-4c7c-9130-dfa456fe426a" processor="http:request">
 				<munit-tools:with-attributes >
@@ -155,19 +155,6 @@
 			</munit-tools:store>
 			<flow-ref doc:name="Call to scheduleFlow" doc:id="b5fb35a1-358e-44ea-bf3e-d1d510af1b0c" name="scheduleFlow" />
 			</munit:execution>
-			<munit:validation >
-				<munit-tools:assert-that doc:name="Check not null" doc:id="f25ad0a4-1727-4b28-92ce-a9dd933dbd9b" is="#[MunitTools::notNullValue()]" expression="#[payload]" />
-			<munit-tools:verify-call doc:name="Verify OS Store Call" doc:id="d6c64569-fc90-493e-b613-958ad6710c62" processor="os:store" times="0" >
-				<munit-tools:with-attributes >
-					<munit-tools:with-attribute whereValue="SYDCCU" attributeName="key" />
-				</munit-tools:with-attributes>
-				</munit-tools:verify-call>
-			<munit-tools:verify-call doc:name="Verify OS Retrieve Call" doc:id="50a7cdb3-5d41-430e-abe7-a7fab8b84ae9" processor="os:retrieve" times="1">
-				<munit-tools:with-attributes >
-					<munit-tools:with-attribute whereValue="SYDCCU" attributeName="key" />
-				</munit-tools:with-attributes>
-			</munit-tools:verify-call>
-			</munit:validation>
 		</munit:test>
 	
 	
