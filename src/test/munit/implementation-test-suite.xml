@@ -156,6 +156,24 @@
 			<flow-ref doc:name="Call to scheduleFlow" doc:id="b5fb35a1-358e-44ea-bf3e-d1d510af1b0c" name="scheduleFlow" />
 			</munit:execution>
 		</munit:test>
+	<munit:test name="routesFlowTest-error-http" doc:id="bf83fdf4-6f9a-4c46-9581-f61bf7892d17" description="Test" expectedErrorType="HTTP:CONNECTIVITY">
+			<munit:behavior>
+			<munit-tools:mock-when doc:name="Mock HTTP Error" doc:id="e8032289-2e10-4ec5-beb9-63cead77d5bb" processor="http:request">
+				<munit-tools:with-attributes >
+					<munit-tools:with-attribute whereValue="GET" attributeName="method" />
+				</munit-tools:with-attributes>
+				<munit-tools:then-return >
+					<munit-tools:error typeId="HTTP:CONNECTIVITY" />
+				</munit-tools:then-return>
+			</munit-tools:mock-when>
+			</munit:behavior>
+		<munit:execution>
+				<munit:set-event doc:name="Set URI Params" doc:id="84faac04-8aca-466d-8536-a6425ed18bb6">
+				<munit:attributes value="#[{uriParams : {'transportType' :'LAND','transportCompany' :'FirstCoach'}}]" />
+				</munit:set-event>
+				<flow-ref doc:name="Flow-ref to routesFlow" doc:id="21c258a6-dc06-4566-914b-d32fde9acc85" name="routesFlow" />
+			</munit:execution>
+		</munit:test>
 	
 	
 
